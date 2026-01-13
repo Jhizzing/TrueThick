@@ -1,0 +1,13 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.streamlit/config.toml
+.gemini/
+.DS_Store
+*.csv
+walkthrough.md
+task.md
+implementation_plan.md
+[ARTIFACT]*
+brain/
