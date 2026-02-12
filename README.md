@@ -5,49 +5,49 @@ TrueThick is a professional geological tool designed for structural orientation 
 ## Key Features
 
 - **Structural Orientation Solver**: Seamlessly convert between Kenometer (Alpha/Beta) measurements and geological orientations (Dip/Dip Direction).
-- **Intercept Analysis**: 
+- **Intercept Analysis**:
     - Calculate **True Thickness** using either structural data or direct Alpha angles.
     - Calculate **Gram-Meters** (metal accumulation) for mineralized intercepts.
 - **Brand Integrated UI**: High-end LogiQore aesthetic with gold accents and glassmorphic design.
+- **Zero Dependencies**: Pure HTML/CSS/JS — no server, no frameworks, no build step.
 - **Data Export**: CSV report export (planned).
 
-## Installation
+## Usage
 
-To run the application locally:
+### Open directly
 
-1. **Clone the repository**:
-   ```bash
-   git clone <your-repo-url>
-   cd TrueThick
-   ```
+Double-click `index.html` or serve it from any static host. No installation required.
 
-2. **Set up the environment**:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # Mac/Linux
-   # or venv\Scripts\activate  # Windows
-   pip install -r requirements.txt
-   ```
+### Embed on LogiQore.io
 
-3. **Launch the app**:
-   ```bash
-   streamlit run app.py
-   ```
+Add a single iframe tag to your website:
 
-## Deployment on LogiQore.io
+```html
+<iframe src="https://jhizzing.github.io/TrueThick/"
+        width="100%" height="800" frameborder="0"
+        style="border-radius: 16px;">
+</iframe>
+```
 
-To host this on your website:
+### Deploy via GitHub Pages
 
-### Option 1: Streamlit Community Cloud (Recommended)
 1. Push this repository to **GitHub**.
-2. Connect your GitHub account to [Streamlit Cloud](https://share.streamlit.io/).
-3. Deploy the `app.py` file. It will give you a public URL.
-4. On `logiqore.io`, you can link to this URL or embed it via an `iframe`.
+2. Go to **Settings → Pages** and set the source to the `main` branch.
+3. Your app is live at `https://<username>.github.io/TrueThick/`.
 
-### Option 2: Standalone Download
-If you wish to provide a "Download" link for users to run it locally:
-1. Provide a link to the GitHub repository.
-2. Or use [Stlite](https://stlite.net/) to bundle it into a static HTML file that runs entirely in the browser without a backend server.
+### Run locally
+
+Any static file server works:
+
+```bash
+# Python
+python3 -m http.server 8000
+
+# Node
+npx serve .
+```
+
+Then open `http://localhost:8000`.
 
 ---
 *Developed for LogiQore. Modern Structural Orientation & True Thickness Analysis.*

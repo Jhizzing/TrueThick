@@ -1,37 +1,16 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-build/
-develop/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-venv/
-.venv/
+# OS
+.DS_Store
+Thumbs.db
 
-# Streamlit (keep config.toml tracked for security settings)
-# .streamlit/config.toml
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # Project specific
 .gemini/
-.DS_Store
-*.csv
+brain/
 walkthrough.md
 task.md
 implementation_plan.md
-brain/
-# Don't ignore README.md
