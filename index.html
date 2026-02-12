@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrueThick | LogiQore</title>
+    <style>
+        /* ===== Reset & Global ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #0E1117;
+            color: #E0E0E0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ===== Layout ===== */
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .header-icon {
+            font-size: 2.8rem;
+            line-height: 1;
+        }
+
+        .main-title {
+            background: linear-gradient(90deg, #FFFFFF 0%, #DAA520 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+
+        /* ===== Tabs ===== */
+        .tab-bar {
+            display: flex;
+            gap: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: #888;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.75rem 0;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover { color: #bbb; }
+
+        .tab-btn.active {
+            color: #DAA520;
+            border-bottom-color: #DAA520;
+            background-color: rgba(218, 165, 32, 0.05);
+        }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ===== Glass Card ===== */
+        .glass-card {
+            background: rgba(30, 35, 43, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* ===== Typography ===== */
+        h2 {
+            color: #FFF;
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.25rem;
+        }
+
+        .section-caption {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 1.25rem;
+        }
+
+        h3 {
+            color: #FFF;
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 1.5rem 0;
+        }
+
+        /* ===== Form Elements ===== */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group { display: flex; flex-direction: column; }
+
+        .form-group label {
+            color: #aaa;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-group input[type="number"] {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #E0E0E0;
+            font-family: inherit;
+            font-size: 1rem;
+            padding: 0.6rem 0.8rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input[type="number"]:focus {
+            outline: none;
+            border-color: #DAA520;
+            box-shadow: 0 0 0 2px rgba(218,165,32,0.15);
+        }
+
+        /* ===== Radio Toggle ===== */
+        .radio-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #aaa;
+            transition: all 0.2s;
+        }
+
+        .radio-group input[type="radio"] { display: none; }
+
+        .radio-group input[type="radio"]:checked + label {
+            border-color: #DAA520;
+            color: #DAA520;
+            background: rgba(218,165,32,0.08);
+        }
+
+        /* ===== Button ===== */
+        .btn-primary {
+            display: block;
+            width: 100%;
+            background-color: #DAA520;
+            color: #000;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            padding: 0.75rem 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(218, 165, 32, 0.4);
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(218, 165, 32, 0.6);
+            background-color: #FFD700;
+        }
+
+        .btn-primary:active { transform: translateY(0); }
+
+        /* ===== Metric Cards ===== */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.25rem;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+        }
+
+        .metric-value {
+            color: #DAA520;
+            font-weight: 800;
+            font-size: 2rem;
+            line-height: 1.2;
+        }
+
+        .metric-label {
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        /* ===== Alert Badges ===== */
+        .alert {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .alert-info {
+            background: rgba(30, 100, 200, 0.12);
+            border: 1px solid rgba(30, 100, 200, 0.25);
+            color: #8ab4f8;
+        }
+
+        .alert-warning {
+            background: rgba(218, 165, 32, 0.12);
+            border: 1px solid rgba(218, 165, 32, 0.25);
+            color: #f0c36d;
+        }
+
+        .alert-error {
+            background: rgba(200, 50, 50, 0.12);
+            border: 1px solid rgba(200, 50, 50, 0.25);
+            color: #f28b82;
+        }
+
+        /* ===== Results ===== */
+        .results { display: none; }
+        .results.visible { display: block; }
+
+        /* ===== Footer ===== */
+        .footer {
+            text-align: center;
+            color: #444;
+            font-size: 0.8rem;
+            margin-top: 2rem;
+            padding-bottom: 1rem;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 540px) {
+            .main-title { font-size: 2.2rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .metrics-row { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">🪨</div>
+            <div>
+                <div class="main-title">TrueThick</div>
+                <div class="subtitle">Modern Structural Orientation &amp; True Thickness Analysis</div>
+            </div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <button class="tab-btn active" data-tab="orientation">Orientation Solver</button>
+            <button class="tab-btn" data-tab="intercept">Intercept Analysis</button>
+        </div>
+
+        <!-- ======================== -->
+        <!-- TAB 1: ORIENTATION SOLVER -->
+        <!-- ======================== -->
+        <div id="tab-orientation" class="tab-panel active">
+            <div class="glass-card">
+                <h2>Structural Orientation Tool</h2>
+                <p class="section-caption">Convert between Kenometer measurements and geological orientation.</p>
+
+                <!-- Mode Selection -->
+                <h3>Measurement Input Mode</h3>
+                <div class="radio-group">
+                    <input type="radio" name="orient-mode" id="mode-ab" value="alpha_beta" checked>
+                    <label for="mode-ab">Alpha/Beta (Kenometer)</label>
+                    <input type="radio" name="orient-mode" id="mode-dd" value="dip_dipdir">
+                    <label for="mode-dd">Dip/DipDir (Orientation)</label>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Drillhole Orientation -->
+                <h3>Drillhole Orientation</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="t1-hole-az">Hole Azimuth (°)</label>
+                        <input type="number" id="t1-hole-az" value="240" min="0" max="360" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="t1-hole-dip">Hole Dip (°)</label>
+                        <input type="number" id="t1-hole-dip" value="-60" min="-90" max="0" step="1">
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Alpha/Beta Inputs -->
+                <div id="ab-inputs">
+                    <h3>Kenometer Measurements</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="t1-alpha">Alpha (°)</label>
+                            <input type="number" id="t1-alpha" value="60" min="0" max="90" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="t1-beta">Beta (°)</label>
+                            <input type="number" id="t1-beta" value="30" min="0" max="360" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dip/DipDir Inputs -->
+                <div id="dd-inputs" style="display:none;">
+                    <h3>Structure Orientation</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="t1-dipdir">Dip Direction (°)</label>
+                            <input type="number" id="t1-dipdir" value="135" min="0" max="360" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="t1-dip">Dip (°)</label>
+                            <input type="number" id="t1-dip" value="45" min="0" max="90" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="btn-solve">SOLVE ORIENTATION</button>
+            </div>
+
+            <!-- Results -->
+            <div id="orient-results" class="glass-card results">
+                <h2 id="orient-results-title">Final Orientation</h2>
+                <div class="metrics-row" id="orient-metrics"></div>
+                <div id="orient-error"></div>
+            </div>
+        </div>
+
+        <!-- ======================== -->
+        <!-- TAB 2: INTERCEPT ANALYSIS -->
+        <!-- ======================== -->
+        <div id="tab-intercept" class="tab-panel">
+            <div class="glass-card">
+                <h2>Significant Intercept Analysis</h2>
+                <p class="section-caption">Calculate True Thickness and metal accumulation (Gram-Meters).</p>
+
+                <!-- Drillhole Orientation -->
+                <h3>Drillhole Orientation</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="t2-hole-az">Hole Azimuth (°)</label>
+                        <input type="number" id="t2-hole-az" value="240" min="0" max="360" step="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="t2-hole-dip">Hole Dip (°)</label>
+                        <input type="number" id="t2-hole-dip" value="-60" min="-90" max="0" step="1">
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Method Selection -->
+                <h3>Calculation Method</h3>
+                <div class="radio-group">
+                    <input type="radio" name="intercept-method" id="method-struct" value="structural" checked>
+                    <label for="method-struct">Structural Orientation (Dip/DipDir)</label>
+                    <input type="radio" name="intercept-method" id="method-alpha" value="alpha_direct">
+                    <label for="method-alpha">Alpha Angle (Kenometer)</label>
+                </div>
+
+                <!-- Structural Inputs -->
+                <div id="struct-inputs">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="t2-dipdir">Structure Dip Direction (°)</label>
+                            <input type="number" id="t2-dipdir" value="135" min="0" max="360" step="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="t2-dip">Structure Dip (°)</label>
+                            <input type="number" id="t2-dip" value="45" min="0" max="90" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Direct Alpha Input -->
+                <div id="alpha-input" style="display:none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="t2-alpha">Direct Alpha Angle (°)</label>
+                            <input type="number" id="t2-alpha" value="60" min="0" max="90" step="1">
+                        </div>
+                        <div class="form-group"></div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Intercept Data -->
+                <h3>Intercept Details</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="t2-length">Downhole Length (m)</label>
+                        <input type="number" id="t2-length" value="10" min="0" max="1000" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="t2-grade">Avg Grade (e.g. g/t)</label>
+                        <input type="number" id="t2-grade" value="5" min="0" max="1000" step="0.01">
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="btn-analyze">ANALYZE INTERCEPT</button>
+            </div>
+
+            <!-- Results -->
+            <div id="intercept-results" class="glass-card results">
+                <h2>Calculated Metrics</h2>
+                <div class="metrics-row" id="intercept-metrics"></div>
+                <div id="intercept-interpretation"></div>
+                <div id="intercept-error"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">TrueThick v2.0 | Powered by LogiQore Aesthetics</div>
+    </div>
+
+<script>
+// =============================================
+// GEOMETRY ENGINE (ported from geometry.py)
+// =============================================
+const Geo = (() => {
+    const DEG2RAD = Math.PI / 180;
+    const RAD2DEG = 180 / Math.PI;
+    const EPSILON = 1e-10;
+
+    function deg2rad(d) { return d * DEG2RAD; }
+    function rad2deg(r) { return r * RAD2DEG; }
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+    // --- Vec3 helpers ---
+    function vec3(x, y, z) { return [x, y, z]; }
+    function dot(a, b) { return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]; }
+    function cross(a, b) {
+        return [
+            a[1]*b[2] - a[2]*b[1],
+            a[2]*b[0] - a[0]*b[2],
+            a[0]*b[1] - a[1]*b[0]
+        ];
+    }
+    function norm(v) { return Math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]); }
+    function scale(v, s) { return [v[0]*s, v[1]*s, v[2]*s]; }
+    function add(a, b) { return [a[0]+b[0], a[1]+b[1], a[2]+b[2]]; }
+    function sub(a, b) { return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]; }
+
+    function safeNormalize(v) {
+        const n = norm(v);
+        if (n < EPSILON) throw new Error("Degenerate input produced a zero-length vector.");
+        return [v[0]/n, v[1]/n, v[2]/n];
+    }
+
+    // --- Geometry functions ---
+    function holeVector(azDeg, dipDeg) {
+        const az = deg2rad(azDeg);
+        const dip = deg2rad(dipDeg);
+        return safeNormalize(vec3(
+            Math.sin(az) * Math.cos(dip),
+            Math.cos(az) * Math.cos(dip),
+            Math.sin(dip)
+        ));
+    }
+
+    function planeNormalFromDipDipdir(dipDeg, dipdirDeg) {
+        const dip = deg2rad(dipDeg);
+        const dipdir = deg2rad(dipdirDeg);
+        const strike = dipdir - Math.PI / 2;
+        return safeNormalize(vec3(
+            Math.sin(dip) * Math.sin(strike),
+            Math.sin(dip) * Math.cos(strike),
+            Math.cos(dip)
+        ));
+    }
+
+    function alphaNormal(holeVec, planeNormal) {
+        const d = dot(holeVec, planeNormal);
+        return rad2deg(Math.acos(clamp(Math.abs(d), -1, 1)));
+    }
+
+    function alphaKenometer(alphaNormalDeg) {
+        return 90.0 - alphaNormalDeg;
+    }
+
+    function betaAngle(holeVec, planeNormal) {
+        const proj = sub(holeVec, scale(planeNormal, dot(holeVec, planeNormal)));
+        const holeProj = safeNormalize(proj);
+        const dipDirVec = safeNormalize(cross(planeNormal, [0, 0, 1]));
+        const d = dot(holeProj, dipDirVec);
+        return rad2deg(Math.acos(clamp(d, -1, 1)));
+    }
+
+    function trueThicknessFromAlpha(downholeLength, alphaKenoDeg) {
+        return downholeLength * Math.sin(deg2rad(alphaKenoDeg));
+    }
+
+    function calculateGramMeters(grade, trueThickness) {
+        return grade * trueThickness;
+    }
+
+    function alphaBetaToPlaneNormal(holeAzDeg, holeDipDeg, alphaDeg, betaDeg) {
+        const az = deg2rad(holeAzDeg);
+        const dip = deg2rad(holeDipDeg);
+        const alpha = deg2rad(alphaDeg);
+        const beta = deg2rad(betaDeg);
+
+        const holeVec = safeNormalize(vec3(
+            Math.sin(az) * Math.cos(dip),
+            Math.cos(az) * Math.cos(dip),
+            Math.sin(dip)
+        ));
+
+        const ref = Math.abs(holeVec[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0];
+        const v1 = safeNormalize(cross(holeVec, ref));
+        const v2 = safeNormalize(cross(holeVec, v1));
+
+        const nHole = add(
+            scale(holeVec, Math.cos(alpha)),
+            scale(add(scale(v1, Math.cos(beta)), scale(v2, Math.sin(beta))), Math.sin(alpha))
+        );
+        return safeNormalize(nHole);
+    }
+
+    function normalToDipDipdir(n) {
+        const dipRad = Math.acos(Math.abs(n[2]));
+        const dipDeg = rad2deg(dipRad);
+        let dipdirDeg = rad2deg(Math.atan2(n[0], n[1]));
+        if (dipdirDeg < 0) dipdirDeg += 360;
+        return { dip: dipDeg, dipdir: dipdirDeg };
+    }
+
+    function alphaBetaToDipDipdir(holeAz, holeDip, alpha, beta) {
+        const normal = alphaBetaToPlaneNormal(holeAz, holeDip, alpha, beta);
+        const { dip, dipdir } = normalToDipDipdir(normal);
+        let strike = dipdir - 90;
+        if (strike < 0) strike += 360;
+        return { dip, dipdir, strike };
+    }
+
+    return {
+        holeVector, planeNormalFromDipDipdir,
+        alphaNormal, alphaKenometer, betaAngle,
+        trueThicknessFromAlpha, calculateGramMeters,
+        alphaBetaToDipDipdir
+    };
+})();
+
+// =============================================
+// UI LOGIC
+// =============================================
+document.addEventListener("DOMContentLoaded", () => {
+
+    // --- Tab switching ---
+    const tabBtns = document.querySelectorAll(".tab-btn");
+    const tabPanels = document.querySelectorAll(".tab-panel");
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            tabBtns.forEach(b => b.classList.remove("active"));
+            tabPanels.forEach(p => p.classList.remove("active"));
+            btn.classList.add("active");
+            document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+        });
+    });
+
+    // --- Tab 1: Mode toggle ---
+    const modeRadios = document.querySelectorAll('input[name="orient-mode"]');
+    const abInputs = document.getElementById("ab-inputs");
+    const ddInputs = document.getElementById("dd-inputs");
+
+    modeRadios.forEach(r => {
+        r.addEventListener("change", () => {
+            const isAB = r.value === "alpha_beta";
+            abInputs.style.display = isAB ? "block" : "none";
+            ddInputs.style.display = isAB ? "none" : "block";
+            document.getElementById("orient-results").classList.remove("visible");
+        });
+    });
+
+    // --- Tab 2: Method toggle ---
+    const methodRadios = document.querySelectorAll('input[name="intercept-method"]');
+    const structInputs = document.getElementById("struct-inputs");
+    const alphaInput = document.getElementById("alpha-input");
+
+    methodRadios.forEach(r => {
+        r.addEventListener("change", () => {
+            const isStruct = r.value === "structural";
+            structInputs.style.display = isStruct ? "block" : "none";
+            alphaInput.style.display = isStruct ? "none" : "block";
+            document.getElementById("intercept-results").classList.remove("visible");
+        });
+    });
+
+    // --- Helper: read number input ---
+    function val(id) { return parseFloat(document.getElementById(id).value); }
+
+    // --- Helper: render metric ---
+    function metricHTML(label, value) {
+        return `<div class="metric"><div class="metric-value">${value}</div><div class="metric-label">${label}</div></div>`;
+    }
+
+    // --- Tab 1: Solve Orientation ---
+    document.getElementById("btn-solve").addEventListener("click", () => {
+        const results = document.getElementById("orient-results");
+        const metricsEl = document.getElementById("orient-metrics");
+        const errorEl = document.getElementById("orient-error");
+        const titleEl = document.getElementById("orient-results-title");
+
+        errorEl.innerHTML = "";
+        metricsEl.innerHTML = "";
+
+        const mode = document.querySelector('input[name="orient-mode"]:checked').value;
+        const holeAz = val("t1-hole-az");
+        const holeDip = val("t1-hole-dip");
+
+        try {
+            if (mode === "alpha_beta") {
+                const alpha = val("t1-alpha");
+                const beta = val("t1-beta");
+                const r = Geo.alphaBetaToDipDipdir(holeAz, holeDip, alpha, beta);
+
+                titleEl.textContent = "Final Orientation";
+                metricsEl.innerHTML =
+                    metricHTML("Dip", r.dip.toFixed(1) + "°") +
+                    metricHTML("Dip Direction", r.dipdir.toFixed(1) + "°") +
+                    metricHTML("Strike", r.strike.toFixed(1) + "°");
+            } else {
+                const structDip = val("t1-dip");
+                const structDipdir = val("t1-dipdir");
+                const hv = Geo.holeVector(holeAz, holeDip);
+                const pn = Geo.planeNormalFromDipDipdir(structDip, structDipdir);
+                const aNorm = Geo.alphaNormal(hv, pn);
+                const aKeno = Geo.alphaKenometer(aNorm);
+                const bVal = Geo.betaAngle(hv, pn);
+
+                titleEl.textContent = "Kenometer Geometry";
+                metricsEl.innerHTML =
+                    metricHTML("Alpha", aKeno.toFixed(1) + "°") +
+                    metricHTML("Beta", bVal.toFixed(1) + "°");
+            }
+            results.classList.add("visible");
+        } catch {
+            errorEl.innerHTML = '<div class="alert alert-error">A calculation error occurred. Please check your inputs and try again.</div>';
+            results.classList.add("visible");
+        }
+    });
+
+    // --- Tab 2: Analyze Intercept ---
+    document.getElementById("btn-analyze").addEventListener("click", () => {
+        const results = document.getElementById("intercept-results");
+        const metricsEl = document.getElementById("intercept-metrics");
+        const interpEl = document.getElementById("intercept-interpretation");
+        const errorEl = document.getElementById("intercept-error");
+
+        metricsEl.innerHTML = "";
+        interpEl.innerHTML = "";
+        errorEl.innerHTML = "";
+
+        const method = document.querySelector('input[name="intercept-method"]:checked').value;
+        const holeAz = val("t2-hole-az");
+        const holeDip = val("t2-hole-dip");
+        const interval = val("t2-length");
+        const grade = val("t2-grade");
+
+        try {
+            let aVal;
+            if (method === "structural") {
+                const structDip = val("t2-dip");
+                const structDipdir = val("t2-dipdir");
+                const hv = Geo.holeVector(holeAz, holeDip);
+                const pn = Geo.planeNormalFromDipDipdir(structDip, structDipdir);
+                const aNorm = Geo.alphaNormal(hv, pn);
+                aVal = Geo.alphaKenometer(aNorm);
+            } else {
+                aVal = val("t2-alpha");
+            }
+
+            const tt = Geo.trueThicknessFromAlpha(interval, aVal);
+            const gm = Geo.calculateGramMeters(grade, tt);
+
+            metricsEl.innerHTML =
+                metricHTML("True Thickness", tt.toFixed(2) + " m") +
+                metricHTML("Gram-Meters", gm.toFixed(1)) +
+                metricHTML("Intersection Alpha", aVal.toFixed(1) + "°");
+
+            if (aVal > 70) {
+                interpEl.innerHTML = '<div class="alert alert-info">🎯 <strong>High-angle intersection:</strong> Near-perpendicular cut. Thickness is reliable.</div>';
+            } else if (aVal > 40) {
+                interpEl.innerHTML = '<div class="alert alert-info">✅ <strong>Moderate-angle intersection:</strong> Reasonable cut.</div>';
+            } else {
+                interpEl.innerHTML = '<div class="alert alert-warning">⚠️ <strong>Low-angle intersection:</strong> Shallow cut. Likely apparent thickness inflation.</div>';
+            }
+
+            results.classList.add("visible");
+        } catch {
+            errorEl.innerHTML = '<div class="alert alert-error">A calculation error occurred. Please check your inputs and try again.</div>';
+            results.classList.add("visible");
+        }
+    });
+});
+</script>
+</body>
+</html>
