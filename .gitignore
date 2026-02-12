@@ -23,8 +23,8 @@ wheels/
 venv/
 .venv/
 
-# Streamlit
-.streamlit/config.toml
+# Streamlit (keep config.toml tracked for security settings)
+# .streamlit/config.toml
 
 # Project specific
 .gemini/

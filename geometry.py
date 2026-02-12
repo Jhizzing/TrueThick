@@ -7,6 +7,14 @@ import numpy as np
 def deg2rad(deg):
     return np.deg2rad(deg)
 
+
+def _safe_normalize(v):
+    """Normalize a vector, raising ValueError if it is degenerate (zero-length)."""
+    norm = np.linalg.norm(v)
+    if norm < 1e-10:
+        raise ValueError("Degenerate input produced a zero-length vector.")
+    return v / norm
+
 # -----------------------------
 # Hole Vector
 # -----------------------------
@@ -25,7 +33,7 @@ def hole_vector(azimuth_deg, dip_deg):
     z = np.sin(dip)
 
     v = np.array([x, y, z])
-    return v / np.linalg.norm(v)
+    return _safe_normalize(v)
 
 # -----------------------------
 # Plane from Dip / DipDir
@@ -45,7 +53,7 @@ def plane_normal_from_dip_dipdir(dip_deg, dipdir_deg):
     nz = np.cos(dip)
 
     n = np.array([nx, ny, nz])
-    return n / np.linalg.norm(n)
+    return _safe_normalize(n)
 
 # -----------------------------
 # Alpha / Beta from Orientation
@@ -72,11 +80,11 @@ def beta_angle(hole_vec, plane_normal):
     Beta using right-hand rule (clockwise looking downhole)
     """
     hole_proj = hole_vec - np.dot(hole_vec, plane_normal) * plane_normal
-    hole_proj = hole_proj / np.linalg.norm(hole_proj)
+    hole_proj = _safe_normalize(hole_proj)
 
     # Dip direction vector
     dip_dir_vec = np.cross(plane_normal, [0, 0, 1])
-    dip_dir_vec = dip_dir_vec / np.linalg.norm(dip_dir_vec)
+    dip_dir_vec = _safe_normalize(dip_dir_vec)
 
     dot = np.dot(hole_proj, dip_dir_vec)
     beta = np.arccos(np.clip(dot, -1.0, 1.0))
@@ -119,7 +127,7 @@ def alpha_beta_to_plane_normal(hole_az_deg, hole_dip_deg, alpha_deg, beta_deg):
     hy = np.cos(az) * np.cos(dip)
     hz = np.sin(dip)
     hole_vec = np.array([hx, hy, hz])
-    hole_vec = hole_vec / np.linalg.norm(hole_vec)
+    hole_vec = _safe_normalize(hole_vec)
 
     # Build orthonormal basis around hole
     if abs(hole_vec[2]) < 0.9:
@@ -128,10 +136,10 @@ def alpha_beta_to_plane_normal(hole_az_deg, hole_dip_deg, alpha_deg, beta_deg):
         ref = np.array([1, 0, 0])
 
     v1 = np.cross(hole_vec, ref)
-    v1 = v1 / np.linalg.norm(v1)
+    v1 = _safe_normalize(v1)
 
     v2 = np.cross(hole_vec, v1)
-    v2 = v2 / np.linalg.norm(v2)
+    v2 = _safe_normalize(v2)
 
     # Plane normal in hole frame
     n_hole = (
@@ -139,7 +147,7 @@ def alpha_beta_to_plane_normal(hole_az_deg, hole_dip_deg, alpha_deg, beta_deg):
         np.sin(alpha) * (np.cos(beta) * v1 + np.sin(beta) * v2)
     )
 
-    n_hole = n_hole / np.linalg.norm(n_hole)
+    n_hole = _safe_normalize(n_hole)
     return n_hole
 
 

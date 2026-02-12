@@ -1,3 +1,6 @@
+import logging
+import os
+
 import streamlit as st
 
 from geometry import (
@@ -11,6 +14,8 @@ from geometry import (
     alpha_beta_to_dip_dipdir
 )
 
+logger = logging.getLogger(__name__)
+
 # -----------------------------
 # Page Config
 # -----------------------------
@@ -22,14 +27,14 @@ st.set_page_config(
 
 # -----------------------------
 # Custom CSS (LogiQore Aesthetic)
+# SECURITY: All HTML below is static/hardcoded. Never interpolate user
+# input into these unsafe_allow_html blocks — doing so creates XSS risk.
 # -----------------------------
 st.markdown("""
 <style>
-    /* Global Styles */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-    
+    /* Global Styles — using system font stack instead of external Google Fonts */
     html, body, [data-testid="stAppViewContainer"] {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         background-color: #0E1117;
     }
 
@@ -137,13 +142,19 @@ st.markdown("""
 # -----------------------------
 # Header Section
 # -----------------------------
+# SECURITY: Logo loaded locally to avoid external resource dependency.
+# Place a logo.png in the project root to display it; falls back to icon.
 col_logo, col_title = st.columns([1, 4])
 with col_logo:
-    st.image("https://logiqore.io/logo.png", width=100)
+    _logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+    if os.path.isfile(_logo_path):
+        st.image(_logo_path, width=100)
+    else:
+        st.markdown("### 🪨")
 
 with col_title:
     st.markdown('<h1 class="main-title">TrueThick</h1>', unsafe_allow_html=True)
-    st.markdown('<p style="color: #888; margin-top: -10px;">Modern Structural Orientation & True Thickness Analysis</p>', unsafe_allow_html=True)
+    st.caption("Modern Structural Orientation & True Thickness Analysis")
 
 st.write("") # Spacer
 
@@ -157,7 +168,7 @@ tab_orientation, tab_intercept = st.tabs(["Orientation Solver", "Intercept Analy
 # ==========================================
 with tab_orientation:
     st.subheader("Structural Orientation Tool")
-    st.markdown('<p style="color: #888;">Convert between Kenometer measurements and geological orientation.</p>', unsafe_allow_html=True)
+    st.caption("Convert between Kenometer measurements and geological orientation.")
     
     # 1. Configuration
     col_mode, col_blank = st.columns([2, 1])
@@ -219,15 +230,16 @@ with tab_orientation:
                 col_r1.metric("ALPHA", f"{a_keno:.1f}°")
                 col_r2.metric("BETA", f"{b_val:.1f}°")
 
-        except Exception as e:
-            st.error(f"Calculation error: {e}")
+        except Exception:
+            logger.exception("Orientation calculation failed")
+            st.error("A calculation error occurred. Please check your inputs and try again.")
 
 # ==========================================
 # TAB 2: INTERCEPT ANALYSIS
 # ==========================================
 with tab_intercept:
     st.subheader("Significant Intercept Analysis")
-    st.markdown('<p style="color: #888;">Calculate True Thickness and metal accumulation (Gram-Meters).</p>', unsafe_allow_html=True)
+    st.caption("Calculate True Thickness and metal accumulation (Gram-Meters).")
 
     # 1. Orientation Context
     st.write("**Drillhole Orientation**")
@@ -301,13 +313,14 @@ with tab_intercept:
             else:
                 st.warning("⚠️ **Low-angle intersection:** Shallow cut. Likely apparent thickness inflation.")
 
-        except Exception as e:
-            st.error(f"Calculation error: {e}")
+        except Exception:
+            logger.exception("Intercept calculation failed")
+            st.error("A calculation error occurred. Please check your inputs and try again.")
 
 # -----------------------------
 # Footer
 # -----------------------------
 st.write("")
 st.write("")
-st.markdown('<p style="text-align: center; color: #444; font-size: 0.8rem;">TrueThick v2.0 | Powered by LogiQore Aesthetics</p>', unsafe_allow_html=True)
+st.caption("TrueThick v2.0 | Powered by LogiQore Aesthetics")
 
