@@ -9,7 +9,7 @@ TrueThick is a professional geological tool designed for structural orientation 
     - Calculate **True Thickness** using either structural data or direct Alpha angles.
     - Calculate **Gram-Meters** (metal accumulation) for mineralized intercepts.
 - **Brand Integrated UI**: High-end LogiQore aesthetic with gold accents and glassmorphic design.
-- **Data Export**: Export your session results directly to professional CSV reports.
+- **Data Export**: CSV report export (planned).
 
 ## Installation
 
