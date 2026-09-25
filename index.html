@@ -522,10 +522,9 @@ const Geo = (() => {
     function planeNormalFromDipDipdir(dipDeg, dipdirDeg) {
         const dip = deg2rad(dipDeg);
         const dipdir = deg2rad(dipdirDeg);
-        const strike = dipdir - Math.PI / 2;
         return safeNormalize(vec3(
-            Math.sin(dip) * Math.sin(strike),
-            Math.sin(dip) * Math.cos(strike),
+            Math.sin(dip) * Math.sin(dipdir),
+            Math.sin(dip) * Math.cos(dipdir),
             Math.cos(dip)
         ));
     }
