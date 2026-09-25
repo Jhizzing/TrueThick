@@ -188,7 +188,21 @@
             transition: all 0.2s;
         }
 
-        .radio-group input[type="radio"] { display: none; }
+        .radio-group { position: relative; }
+
+        .radio-group input[type="radio"] {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .radio-group input[type="radio"]:focus-visible + label {
+            outline: 2px solid #DAA520;
+            outline-offset: 2px;
+        }
 
         .tag-review {
             font-size: 0.7rem;
