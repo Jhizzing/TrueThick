@@ -161,6 +161,11 @@
             box-shadow: 0 0 0 2px rgba(218,165,32,0.15);
         }
 
+        .form-group input[type="number"][aria-invalid="true"] {
+            border-color: #f28b82;
+            box-shadow: 0 0 0 2px rgba(242,139,130,0.2);
+        }
+
         /* ===== Radio Toggle ===== */
         .radio-group {
             display: flex;
@@ -184,6 +189,17 @@
         }
 
         .radio-group input[type="radio"] { display: none; }
+
+        .tag-review {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            color: #f0c36d;
+            border: 1px solid rgba(218, 165, 32, 0.4);
+            border-radius: 4px;
+            padding: 0 0.35rem;
+        }
 
         .radio-group input[type="radio"]:checked + label {
             border-color: #DAA520;
@@ -323,7 +339,7 @@
                 <h3>Measurement Input Mode</h3>
                 <div class="radio-group">
                     <input type="radio" name="orient-mode" id="mode-ab" value="alpha_beta" checked>
-                    <label for="mode-ab">Alpha/Beta (Kenometer)</label>
+                    <label for="mode-ab">Alpha/Beta (Kenometer) <span class="tag-review">Under review</span></label>
                     <input type="radio" name="orient-mode" id="mode-dd" value="dip_dipdir">
                     <label for="mode-dd">Dip/DipDir (Orientation)</label>
                 </div>
@@ -347,6 +363,7 @@
 
                 <!-- Alpha/Beta Inputs -->
                 <div id="ab-inputs">
+                    <div class="alert alert-warning" style="margin: 0 0 1rem;">Under review: Alpha/Beta → Dip/DipDir results have not been verified and may be wrong. Do not use them for logging or reporting until the next release.</div>
                     <h3>Kenometer Measurements</h3>
                     <div class="form-row">
                         <div class="form-group">
@@ -647,8 +664,42 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // --- Helper: read number input ---
-    function val(id) { return parseFloat(document.getElementById(id).value); }
+    // --- Helper: read and validate number input against its min/max ---
+    class InputError extends Error {}
+
+    function val(id, { positive = false } = {}) {
+        const el = document.getElementById(id);
+        const label = document.querySelector(`label[for="${id}"]`).textContent;
+        const v = parseFloat(el.value);
+        let msg = null;
+        if (!Number.isFinite(v)) msg = `${label} is required and must be a number.`;
+        else if (v < parseFloat(el.min) || v > parseFloat(el.max)) msg = `${label} must be between ${el.min} and ${el.max}.`;
+        else if (positive && v <= 0) msg = `${label} must be greater than 0.`;
+        if (msg) {
+            el.setAttribute("aria-invalid", "true");
+            el.focus();
+            throw new InputError(msg);
+        }
+        return v;
+    }
+
+    function clearInvalid(panel) {
+        panel.querySelectorAll('[aria-invalid="true"]').forEach(el => el.removeAttribute("aria-invalid"));
+    }
+
+    function showAlert(container, kind, text) {
+        const div = document.createElement("div");
+        div.className = "alert alert-" + kind;
+        div.setAttribute("role", kind === "error" ? "alert" : "status");
+        div.textContent = text;
+        container.appendChild(div);
+    }
+
+    function showError(container, err) {
+        showAlert(container, "error", err instanceof InputError
+            ? err.message
+            : "A calculation error occurred. Please check your inputs and try again.");
+    }
 
     // --- Helper: render metric ---
     function metricHTML(label, value) {
@@ -664,12 +715,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         errorEl.innerHTML = "";
         metricsEl.innerHTML = "";
+        clearInvalid(document.getElementById("tab-orientation"));
 
         const mode = document.querySelector('input[name="orient-mode"]:checked').value;
-        const holeAz = val("t1-hole-az");
-        const holeDip = val("t1-hole-dip");
 
         try {
+            const holeAz = val("t1-hole-az");
+            const holeDip = val("t1-hole-dip");
             if (mode === "alpha_beta") {
                 const alpha = val("t1-alpha");
                 const beta = val("t1-beta");
@@ -680,6 +732,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     metricHTML("Dip", r.dip.toFixed(1) + "°") +
                     metricHTML("Dip Direction", r.dipdir.toFixed(1) + "°") +
                     metricHTML("Strike", r.strike.toFixed(1) + "°");
+                showAlert(errorEl, "warning", "Under review: this Alpha/Beta → Dip/DipDir conversion has not been verified and may be wrong. Do not use these results for logging or reporting.");
             } else {
                 const structDip = val("t1-dip");
                 const structDipdir = val("t1-dipdir");
@@ -687,16 +740,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 const pn = Geo.planeNormalFromDipDipdir(structDip, structDipdir);
                 const aNorm = Geo.alphaNormal(hv, pn);
                 const aKeno = Geo.alphaKenometer(aNorm);
-                const bVal = Geo.betaAngle(hv, pn);
+                let bText = "—";
+                try { bText = Geo.betaAngle(hv, pn).toFixed(1) + "°"; } catch {}
 
                 titleEl.textContent = "Kenometer Geometry";
                 metricsEl.innerHTML =
                     metricHTML("Alpha", aKeno.toFixed(1) + "°") +
-                    metricHTML("Beta", bVal.toFixed(1) + "°");
+                    metricHTML("Beta (under review)", bText);
+                showAlert(errorEl, "warning", "Beta is under review and has not been verified; do not use it for logging. Alpha is verified.");
             }
             results.classList.add("visible");
-        } catch {
-            errorEl.innerHTML = '<div class="alert alert-error">A calculation error occurred. Please check your inputs and try again.</div>';
+        } catch (err) {
+            showError(errorEl, err);
             results.classList.add("visible");
         }
     });
@@ -711,14 +766,16 @@ document.addEventListener("DOMContentLoaded", () => {
         metricsEl.innerHTML = "";
         interpEl.innerHTML = "";
         errorEl.innerHTML = "";
+        clearInvalid(document.getElementById("tab-intercept"));
 
         const method = document.querySelector('input[name="intercept-method"]:checked').value;
-        const holeAz = val("t2-hole-az");
-        const holeDip = val("t2-hole-dip");
-        const interval = val("t2-length");
-        const grade = val("t2-grade");
 
         try {
+            const holeAz = val("t2-hole-az");
+            const holeDip = val("t2-hole-dip");
+            const interval = val("t2-length", { positive: true });
+            const grade = val("t2-grade");
+
             let aVal;
             if (method === "structural") {
                 const structDip = val("t2-dip");
@@ -748,8 +805,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             results.classList.add("visible");
-        } catch {
-            errorEl.innerHTML = '<div class="alert alert-error">A calculation error occurred. Please check your inputs and try again.</div>';
+        } catch (err) {
+            showError(errorEl, err);
             results.classList.add("visible");
         }
     });
