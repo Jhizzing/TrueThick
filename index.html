@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- script-src pins the inline <script> by hash: after editing the script, recompute with
+         python3 -c "import re,hashlib,base64;s=re.search(r'<script>(\n.*?)</script>',open('index.html').read(),re.S).group(1);print(base64.b64encode(hashlib.sha256(s.encode()).digest()).decode())" -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-lO6Jq9CRva8tg8VvES6mdmP5iJpbP6M5sfItPZcrvBs='; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E1117'/%3E%3Ctext x='16' y='23' font-family='Arial,sans-serif' font-size='20' font-weight='800' text-anchor='middle' fill='%23DAA520'%3ET%3C/text%3E%3C/svg%3E">
     <title>TrueThick | LogiQore</title>
     <style>
         /* ===== Reset & Global ===== */
@@ -502,7 +506,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="footer">TrueThick v2.0 | Powered by LogiQore Aesthetics</div>
+        <div class="footer">TrueThick v3.1 | Powered by LogiQore Aesthetics</div>
     </div>
 
 <script>
